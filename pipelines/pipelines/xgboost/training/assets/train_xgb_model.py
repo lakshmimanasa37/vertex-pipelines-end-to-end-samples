@@ -15,9 +15,8 @@ from xgboost import XGBRegressor
 logging.basicConfig(level=logging.DEBUG)
 
 
-NUM_COLS = ["dayofweek", "hourofday", "trip_distance", "trip_miles", "trip_seconds"]
-ORD_COLS = ["company"]
-OHE_COLS = ["payment_type"]
+NUM_COLS = ["start_station_id", "end_station_ID"]
+OHE_COLS = ["is_weekend"]
 
 
 def split_xy(df: pd.DataFrame, label: str) -> (pd.DataFrame, pd.Series):
@@ -50,35 +49,19 @@ X_train, y_train = split_xy(df_train, label)
 X_valid, y_valid = split_xy(df_valid, label)
 X_test, y_test = split_xy(df_test, label)
 
-logging.info("Get the number of unique categories for ordinal encoded columns")
-ordinal_columns = X_train[ORD_COLS]
-n_unique_cat = ordinal_columns.nunique()
 
 logging.info("Get indices of columns in base data")
 col_list = X_train.columns.tolist()
 num_indices = indices_in_list(NUM_COLS, col_list)
 cat_indices_onehot = indices_in_list(OHE_COLS, col_list)
-cat_indices_ordinal = indices_in_list(ORD_COLS, col_list)
 
-ordinal_transformers = [
-    (
-        f"ordinal encoding for {ord_col}",
-        OrdinalEncoder(
-            handle_unknown="use_encoded_value", unknown_value=n_unique_cat[ord_col]
-        ),
-        [ord_index],
-    )
-    for ord_col in ORD_COLS
-    for ord_index in cat_indices_ordinal
-]
 all_transformers = [
-    ("numeric_scaling", StandardScaler(), num_indices),
     (
         "one_hot_encoding",
         OneHotEncoder(handle_unknown="ignore"),
         cat_indices_onehot,
     ),
-] + ordinal_transformers
+] 
 
 logging.info("Build sklearn preprocessing steps")
 preprocesser = ColumnTransformer(transformers=all_transformers)
