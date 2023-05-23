@@ -13,9 +13,9 @@ from tensorflow.keras.layers import Dense, Normalization, StringLookup, Concaten
 # used for monitoring during prediction time
 TRAINING_DATASET_INFO = "training_dataset.json"
 # numeric/categorical features in Chicago trips dataset to be preprocessed
-NUM_COLS = ["dayofweek", "hourofday", "trip_distance", "trip_miles", "trip_seconds"]
-ORD_COLS = ["company"]
-OHE_COLS = ["payment_type"]
+NNUM_COLS = ["start_station_id", "end_station_ID"]
+OHE_COLS = ["is_weekend"]
+
 DEFAULT_HPARAMS = dict(
     batch_size=100,
     epochs=1,
@@ -149,26 +149,21 @@ def build_and_compile_model(dataset: Dataset, model_params: dict) -> Model:
 
     # create inputs (scalars with shape `()`)
     num_ins = {name: Input(shape=(), name=name, dtype=tf.float32) for name in NUM_COLS}
-    ord_ins = {name: Input(shape=(), name=name, dtype=tf.string) for name in ORD_COLS}
     cat_ins = {name: Input(shape=(), name=name, dtype=tf.string) for name in OHE_COLS}
 
     # join all inputs and expand by 1 dimension. NOTE: this is useful when passing
     # in scalar inputs to a model in Vertex AI batch predictions or endpoints e.g.
     # `{"instances": {"input1": 1.0, "input2": "str"}}` instead of
     # `{"instances": {"input1": [1.0], "input2": ["str"]}`
-    all_ins = {**num_ins, **ord_ins, **cat_ins}
+    all_ins = {**num_ins, **cat_ins}
     exp_ins = {n: tf.expand_dims(i, axis=-1) for n, i in all_ins.items()}
 
     # preprocess expanded inputs
     num_encoded = [normalization(n, dataset)(exp_ins[n]) for n in NUM_COLS]
-    ord_encoded = [str_lookup(n, dataset, "int")(exp_ins[n]) for n in ORD_COLS]
     ohe_encoded = [str_lookup(n, dataset, "one_hot")(exp_ins[n]) for n in OHE_COLS]
 
-    # ensure ordinal encoded layers is of type float32 (like the other layers)
-    ord_encoded = [tf.cast(x, tf.float32) for x in ord_encoded]
-
     # concat encoded inputs and add dense layers including output layer
-    x = num_encoded + ord_encoded + ohe_encoded
+    x = num_encoded + ohe_encoded
     x = Concatenate()(x)
     for units, activation in model_params["hidden_units"]:
         x = Dense(units, activation=activation)(x)
