@@ -36,7 +36,7 @@ def tensorflow_pipeline(
     model_name: str = "simple_tensorflow",
     dataset_id: str = "preprocessing",
     dataset_location: str = os.environ.get("VERTEX_LOCATION"),
-    ingestion_dataset_id: str = "chicago_taxi_trips",
+    ingestion_dataset_id: str = "new_york_citibike",
     timestamp: str = "2022-12-01 00:00:00",
     staging_bucket: str = os.environ.get("VERTEX_PIPELINE_ROOT"),
     pipeline_files_gcs_path: str = os.environ.get("PIPELINE_FILES_GCS_PATH"),
@@ -71,9 +71,9 @@ def tensorflow_pipeline(
 
     # Create variables to ensure the same arguments are passed
     # into different components of the pipeline
-    label_column_name = "total_fare"
-    time_column = "trip_start_timestamp"
-    ingestion_table = "taxi_trips"
+    label_column_name = "tripduration"
+    time_column = "starttime"
+    ingestion_table = "citibike_trips"
     table_suffix = "_tf_training"  # suffix to table names
     ingested_table = "ingested_data" + table_suffix
     preprocessed_table = "preprocessed_data" + table_suffix
