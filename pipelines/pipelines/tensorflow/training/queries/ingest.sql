@@ -25,8 +25,8 @@ with filter_start_values as (
     FROM `{{ source_dataset }}.{{ source_table }}`, filter_start_values
     WHERE
          DATE({{ filter_column }}) BETWEEN
-         DATE_SUB(DATE(CAST(filter_start_values.filter_start_value as DATETIME)), INTERVAL 3 MONTH) AND
-         DATE_SUB(DATE(filter_start_value), INTERVAL 2 MONTH)
+         DATE_SUB(DATE(CAST(filter_start_values.filter_start_value as DATETIME)), INTERVAL 36 MONTH) AND
+         DATE_SUB(DATE(filter_start_value), INTERVAL 24 MONTH)
 )
 -- Use the average trip_seconds as a replacement for NULL or 0 values
 
