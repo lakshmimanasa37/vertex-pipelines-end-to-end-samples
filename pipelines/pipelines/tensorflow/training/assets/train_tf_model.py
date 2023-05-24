@@ -13,7 +13,7 @@ from tensorflow.keras.layers import Dense, Normalization, StringLookup, Concaten
 # used for monitoring during prediction time
 TRAINING_DATASET_INFO = "training_dataset.json"
 # numeric/categorical features in Chicago trips dataset to be preprocessed
-NNUM_COLS = ["start_station_id", "end_station_id"]
+NUM_COLS = ["start_station_id", "end_station_id"]
 OHE_COLS = ["is_weekend"]
 
 DEFAULT_HPARAMS = dict(
@@ -31,7 +31,7 @@ DEFAULT_HPARAMS = dict(
     hidden_units=[(10, "relu")],
     distribute_strategy="single",
     early_stopping_epochs=5,
-    label="total_fare",
+    label="tripduration",
 )
 
 logging.getLogger().setLevel(logging.INFO)
