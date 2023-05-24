@@ -34,7 +34,8 @@ SELECT
     start_station_id,
     end_station_id,
     starttime,
-    IF(EXTRACT(DAYOFWEEK FROM starttime) = 1 OR EXTRACT(DAYOFWEEK FROM starttime) = 7, true, false) AS is_weekend  
+    IF(EXTRACT(DAYOFWEEK FROM starttime) = 1 OR EXTRACT(DAYOFWEEK FROM starttime) = 7, true, false) AS is_weekend,
+    tripduration AS `{{ target_column }}`
 FROM `bigquery-public-data.new_york_citibike.citibike_trips`
 WHERE
     (tripduration IS NOT NULL OR tripduration > 0)
