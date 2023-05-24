@@ -36,6 +36,6 @@ SELECT
     starttime,
     IF(EXTRACT(DAYOFWEEK FROM starttime) = 1 OR EXTRACT(DAYOFWEEK FROM starttime) = 7, true, false) AS is_weekend,
     tripduration AS `{{ target_column }}`
-FROM `bigquery-public-data.new_york_citibike.citibike_trips`
+FROM filtered_data
 WHERE
     (tripduration IS NOT NULL OR tripduration > 0)
