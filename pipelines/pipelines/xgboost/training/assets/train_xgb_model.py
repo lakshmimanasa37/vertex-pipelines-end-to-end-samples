@@ -15,7 +15,7 @@ from xgboost import XGBRegressor
 logging.basicConfig(level=logging.DEBUG)
 
 
-NUM_COLS = ["start_station_id", "end_station_ID"]
+NUM_COLS = ["start_station_id", "end_station_id"]
 OHE_COLS = ["is_weekend"]
 
 
