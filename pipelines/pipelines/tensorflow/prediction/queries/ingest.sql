@@ -29,28 +29,12 @@ with filter_start_values as (
          DATE_SUB(DATE(filter_start_value), INTERVAL 2 MONTH)
 )
 -- Use the average trip_seconds as a replacement for NULL or 0 values
-,mean_time as (
-    SELECT CAST(avg(trip_seconds) AS INT64) as avg_trip_seconds
-    FROM filtered_data
-)
 
 SELECT
-    CAST(EXTRACT(DAYOFWEEK FROM trip_start_timestamp) AS FLOAT64) AS dayofweek,
-    CAST(EXTRACT(HOUR FROM trip_start_timestamp) AS FLOAT64) AS hourofday,
-    ST_DISTANCE(
-        ST_GEOGPOINT(pickup_longitude, pickup_latitude),
-        ST_GEOGPOINT(dropoff_longitude, dropoff_latitude)) AS trip_distance,
-    trip_miles,
-    CAST( CASE WHEN trip_seconds is NULL then m.avg_trip_seconds
-               WHEN trip_seconds <= 0 then m.avg_trip_seconds
-               ELSE trip_seconds 
-               END AS FLOAT64) AS trip_seconds,
-    payment_type,
-    company,
-FROM filtered_data as t, mean_time as m
+    start_station_id,
+    end_station_id,
+    starttime,
+    IF(EXTRACT(DAYOFWEEK FROM starttime) = 1 OR EXTRACT(DAYOFWEEK FROM starttime) = 7, true, false) AS is_weekend  
+FROM filtered_data
 WHERE
-    trip_miles > 0 AND fare > 0 AND fare < 1500
-    {% for field in ["fare", "trip_start_timestamp", "pickup_longitude",
-                "pickup_latitude", "dropoff_longitude", "dropoff_latitude","payment_type","company"] %}
-        AND `{{ field }}` IS NOT NULL
-    {% endfor %}
+    (tripduration IS NOT NULL OR tripduration > 0)
