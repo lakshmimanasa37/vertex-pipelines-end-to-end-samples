@@ -27,13 +27,12 @@ from pipelines.components import (
     lookup_model,
 )
 
-
-@dsl.pipeline(name="tensorflow-train-pipeline")
-def tensorflow_pipeline(
+@dsl.pipeline(name="pytorch-train-pipeline")
+def pytorch_pipeline(
     project_id: str = os.environ.get("VERTEX_PROJECT_ID"),
     project_location: str = os.environ.get("VERTEX_LOCATION"),
     ingestion_project_id: str = os.environ.get("VERTEX_PROJECT_ID"),
-    model_name: str = "simple_tensorflow",
+    model_name: str = "simple_pytorch",
     dataset_id: str = "preprocessing",
     dataset_location: str = os.environ.get("VERTEX_LOCATION"),
     ingestion_dataset_id: str = "new_york_citibike",
@@ -74,14 +73,14 @@ def tensorflow_pipeline(
     label_column_name = "tripduration"
     time_column = "starttime"
     ingestion_table = "citibike_trips"
-    table_suffix = "_tf_training"  # suffix to table names
+    table_suffix = "_pt_training"  # suffix to table names
     ingested_table = "ingested_data" + table_suffix
     preprocessed_table = "preprocessed_data" + table_suffix
     train_table = "train_data" + table_suffix
     valid_table = "valid_data" + table_suffix
     test_table = "test_data" + table_suffix
     primary_metric = "rootMeanSquaredError"
-    train_script_uri = f"{pipeline_files_gcs_path}/training/assets/train_tf_model.py"
+    train_script_uri = f"{pipeline_files_gcs_path}/training/assets/train_pt_model.py"
     hparams = dict(
         batch_size=100,
         epochs=5,
@@ -256,7 +255,7 @@ def tensorflow_pipeline(
 
 if __name__ == "__main__":
     compiler.Compiler().compile(
-        pipeline_func=tensorflow_pipeline,
+        pipeline_func=pytorch_pipeline,
         package_path="training.json",
         type_check=False,
     )
